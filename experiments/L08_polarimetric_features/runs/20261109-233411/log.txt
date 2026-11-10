@@ -1,0 +1,49 @@
+2026-11-09 23:34:11,452 INFO running L08_polarimetric_features (water_mask) -> /Users/nischal/satsure/nisar_analysis/experiments/L08_polarimetric_features/runs/20261109-233411
+2026-11-09 23:34:14,413 INFO 2025-11-30: features ready (ENL None)
+2026-11-09 23:34:16,583 INFO 2026-01-05: features ready (ENL None)
+2026-11-09 23:34:18,729 INFO 2026-01-17: features ready (ENL None)
+2026-11-09 23:34:20,917 INFO 2026-06-22: features ready (ENL None)
+2026-11-09 23:34:23,026 INFO 2026-09-14: features ready (ENL None)
+2026-11-09 23:34:25,227 INFO feature stack: ['A', 'H', 'HH', 'HH_m15', 'HH_m5', 'HH_min15', 'HH_s15', 'HH_s5', 'HV', 'HV-HH', 'HV-VV', 'HV_m15', 'VV', 'VV-HH', 'alpha_deg', 'copol_coh', 'copol_phase_deg', 'fd_double_bounce_frac', 'fd_surface_frac', 'fd_volume_frac', 'pauli_double', 'pauli_surface', 'pauli_volume', 'span']
+2026-11-09 23:34:25,478 INFO samples: 600000 (fit 443920, val 156080, water 0.065)
+2026-11-09 23:34:25,660 INFO B_HH_tiled_mmu25 2025-11-30: {'threshold_db': -18.836, 'f1': 0.6462, 'iou': 0.4773}
+2026-11-09 23:34:25,825 INFO B_HH_tiled_mmu25 2026-01-05: {'threshold_db': -17.7689, 'f1': 0.6115, 'iou': 0.4404}
+2026-11-09 23:34:26,313 INFO B_HH_tiled_mmu25 2026-01-17: {'threshold_db': -18.4152, 'f1': 0.6693, 'iou': 0.503}
+2026-11-09 23:34:26,492 INFO B_HH_tiled_mmu25 2026-06-22: {'threshold_db': -4.1038, 'f1': 0.0463, 'iou': 0.0237}
+2026-11-09 23:34:26,651 INFO B_HH_tiled_mmu25 2026-09-14: {'threshold_db': -15.1357}
+2026-11-09 23:34:27,004 INFO B_HH_tuned 2025-11-30: {'threshold_db': -16.2852, 'f1': 0.7294, 'iou': 0.574}
+2026-11-09 23:34:27,107 INFO B_HH_tuned 2026-01-05: {'threshold_db': -16.2852, 'f1': 0.6841, 'iou': 0.5199}
+2026-11-09 23:34:27,407 INFO B_HH_tuned 2026-01-17: {'threshold_db': -16.2852, 'f1': 0.747, 'iou': 0.5962}
+2026-11-09 23:34:27,508 INFO B_HH_tuned 2026-06-22: {'threshold_db': -16.2852, 'f1': 0.5796, 'iou': 0.4081}
+2026-11-09 23:34:27,602 INFO B_HH_tuned 2026-09-14: {'threshold_db': -16.2852}
+2026-11-09 23:34:50,309 INFO lgbm_HH 2025-11-30: {'f1': 0.731, 'iou': 0.576}
+2026-11-09 23:35:07,815 INFO lgbm_HH 2026-01-05: {'f1': 0.6872, 'iou': 0.5235}
+2026-11-09 23:35:25,305 INFO lgbm_HH 2026-01-17: {'f1': 0.7484, 'iou': 0.5979}
+2026-11-09 23:35:42,112 INFO lgbm_HH 2026-06-22: {'f1': 0.5704, 'iou': 0.399}
+2026-11-09 23:35:55,997 INFO lgbm_HH 2026-09-14: {}
+2026-11-09 23:36:09,766 INFO lgbm_dual 2025-11-30: {'f1': 0.7337, 'iou': 0.5793}
+2026-11-09 23:36:20,068 INFO lgbm_dual 2026-01-05: {'f1': 0.6917, 'iou': 0.5287}
+2026-11-09 23:36:30,839 INFO lgbm_dual 2026-01-17: {'f1': 0.7468, 'iou': 0.5959}
+2026-11-09 23:36:40,660 INFO lgbm_dual 2026-06-22: {'f1': 0.5881, 'iou': 0.4165}
+2026-11-09 23:36:51,109 INFO lgbm_dual 2026-09-14: {}
+2026-11-09 23:37:05,143 INFO lgbm_copol 2025-11-30: {'f1': 0.8031, 'iou': 0.6709}
+2026-11-09 23:37:14,854 INFO lgbm_copol 2026-01-05: {'f1': 0.7118, 'iou': 0.5525}
+2026-11-09 23:37:24,473 INFO lgbm_copol 2026-01-17: {'f1': 0.7665, 'iou': 0.6213}
+2026-11-09 23:37:33,853 INFO lgbm_copol 2026-06-22: {'f1': 0.6707, 'iou': 0.5046}
+2026-11-09 23:37:42,860 INFO lgbm_copol 2026-09-14: {}
+2026-11-09 23:37:58,044 INFO lgbm_full 2025-11-30: {'f1': 0.8065, 'iou': 0.6757}
+2026-11-09 23:38:08,372 INFO lgbm_full 2026-01-05: {'f1': 0.7234, 'iou': 0.5667}
+2026-11-09 23:38:18,556 INFO lgbm_full 2026-01-17: {'f1': 0.7756, 'iou': 0.6335}
+2026-11-09 23:38:29,054 INFO lgbm_full 2026-06-22: {'f1': 0.6685, 'iou': 0.5021}
+2026-11-09 23:38:38,627 INFO lgbm_full 2026-09-14: {}
+2026-11-09 23:38:54,839 INFO lgbm_dual_tex 2025-11-30: {'f1': 0.8155, 'iou': 0.6885}
+2026-11-09 23:39:05,788 INFO lgbm_dual_tex 2026-01-05: {'f1': 0.7744, 'iou': 0.6318}
+2026-11-09 23:39:16,792 INFO lgbm_dual_tex 2026-01-17: {'f1': 0.8182, 'iou': 0.6923}
+2026-11-09 23:39:27,759 INFO lgbm_dual_tex 2026-06-22: {'f1': 0.6908, 'iou': 0.5276}
+2026-11-09 23:39:38,378 INFO lgbm_dual_tex 2026-09-14: {}
+2026-11-09 23:39:55,195 INFO lgbm_full_tex 2025-11-30: {'f1': 0.8421, 'iou': 0.7273}
+2026-11-09 23:40:06,728 INFO lgbm_full_tex 2026-01-05: {'f1': 0.7852, 'iou': 0.6463}
+2026-11-09 23:40:17,680 INFO lgbm_full_tex 2026-01-17: {'f1': 0.8261, 'iou': 0.7037}
+2026-11-09 23:40:28,356 INFO lgbm_full_tex 2026-06-22: {'f1': 0.7265, 'iou': 0.5704}
+2026-11-09 23:40:39,225 INFO lgbm_full_tex 2026-09-14: {}
+2026-11-09 23:40:39,470 INFO done: /Users/nischal/satsure/nisar_analysis/experiments/L08_polarimetric_features/runs/20261109-233411

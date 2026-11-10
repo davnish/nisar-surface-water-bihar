@@ -1,0 +1,45 @@
+{
+  "timestamp_utc": "2026-11-09T18:10:39+00:00",
+  "git_commit": "919b135da003c0adc35c4887d662c8e86bf52ed2",
+  "git_dirty": true,
+  "nisar_polarimetric_training_commit": "f2c96ff9d9d427711ae56dd756aba2051c37f4ec",
+  "python": "3.12.12",
+  "platform": "macOS-27.2-arm64-arm-64bit",
+  "packages": {
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "h5py": "3.16.0",
+    "rasterio": "1.5.2",
+    "xarray": "2026.9.0",
+    "scikit-learn": "1.9.1",
+    "scikit-image": "0.26.0",
+    "lightgbm": "4.7.0"
+  },
+  "inputs": [
+    {
+      "path": "data/interim/nisar_L/NISAR_L2_PR_GCOV_006_120_D_076_2005_QPDH_A_20251130T125101_20251130T125136_X05010_F_F_J_001_frequencyA_bbox.nc",
+      "bytes": 56901569,
+      "mtime": 1794244083.9537024
+    },
+    {
+      "path": "data/interim/nisar_L/NISAR_L2_PR_GCOV_009_120_D_076_2005_QPDH_A_20260105T125103_20260105T125137_X05009_N_F_J_001_frequencyA_bbox.nc",
+      "bytes": 56890906,
+      "mtime": 1794244669.5144782
+    },
+    {
+      "path": "data/interim/nisar_L/NISAR_L2_PR_GCOV_010_120_D_076_2005_QPDH_A_20260117T125104_20260117T125138_X05010_N_F_J_001_frequencyA_bbox.nc",
+      "bytes": 56903961,
+      "mtime": 1794245186.051624
+    },
+    {
+      "path": "data/interim/nisar_L/NISAR_L2_PR_GCOV_023_120_D_076_2005_QPDH_A_20260622T125103_20260622T125137_P05023_N_F_J_001_frequencyA_bbox.nc",
+      "bytes": 56637159,
+      "mtime": 1794245750.8711426
+    },
+    {
+      "path": "data/interim/nisar_L/NISAR_L2_PR_GCOV_030_120_D_076_2005_QPDH_A_20260914T125059_20260914T125134_P05023_N_F_J_001_frequencyA_bbox.nc",
+      "bytes": 57332469,
+      "mtime": 1794246293.6422129
+    }
+  ]
+}

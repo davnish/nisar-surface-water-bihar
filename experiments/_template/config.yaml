@@ -1,0 +1,18 @@
+id: LXX_short_name           # must equal the folder name
+question: "One-line question this experiment answers"
+task: water_mask             # inventory | reference | separability | water_mask | change | production
+data:
+  band: L
+  granules: []               # GCOV filenames (without .h5) under data/raw/nisar_L
+  frequency: frequencyA
+  terms: [HHHH, HVHV]
+  extent: bbox               # bbox for development, full for production
+preprocess:
+  speckle: {name: none}
+  to_db: true
+method:
+  name: fixed_threshold
+  params: {term: HHHH, threshold_db: -18.0}
+validation:
+  reference: null            # e.g. data/reference/s2_water_{date}.tif
+  split: test

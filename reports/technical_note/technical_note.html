@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NISAR Surface Water — Technical Note</title>
+<style>
+  @page { size: A4; margin: 10mm 14mm 9mm 14mm; }
+  :root { --ink: #1a1a19; --muted: #5a5955; --rule: #d8d6d0; --accent: #1f5fae; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 9.1pt; line-height: 1.3; color: var(--ink); margin: 0; }
+  h1 { font-size: 15pt; margin: 0 0 2pt; line-height: 1.2; }
+  .sub { color: var(--muted); font-size: 9pt; margin-bottom: 8pt; }
+  h2 { font-size: 11pt; margin: 10pt 0 3pt; color: var(--accent); border-bottom: 0.6pt solid var(--rule); padding-bottom: 1.5pt; }
+  h3 { font-size: 9.8pt; margin: 6pt 0 2pt; }
+  p { margin: 0 0 5pt; }
+  ul { margin: 0 0 5pt 14pt; padding: 0; }
+  li { margin: 0 0 1.5pt; }
+  table { border-collapse: collapse; width: 100%; margin: 3pt 0 6pt; font-size: 8.4pt; }
+  th, td { border-bottom: 0.5pt solid var(--rule); padding: 2pt 4pt; text-align: left; vertical-align: top; }
+  th { font-weight: 600; background: #f3f2ee; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .fig { display: flex; gap: 6pt; margin: 4pt 0 6pt; }
+  .fig figure { margin: 0; flex: 1; }
+  .fig img { width: 100%; border: 0.5pt solid var(--rule); }
+  figcaption { font-size: 7.8pt; color: var(--muted); margin-top: 1pt; }
+  .note { font-size: 8.4pt; color: var(--muted); }
+  .keep { break-inside: avoid; }
+  b.c { color: var(--accent); }
+</style>
+</head>
+<body>
+<h1>Mapping surface water and its changes over the Bihar Ganga floodplain with NISAR L- and S-band radar</h1>
+<div class="sub">InGARSS 2026 YP Hackathon — Phase 1 technical note · Study area centre 25.50° N, 86.50° E · Code, maps and full details: <i>nisar_analysis</i> repository (README, experiments/, docs/methodology.md)</div>
+
+<h2>1. Data</h2>
+<ul>
+<li><b>NISAR L-band</b> (NASA ASF DAAC), Level-2 GCOV product. Main series: ascending track 98, frame 14, HH and HV polarisations at 10 m, 15 dates: five in the dry season (28 Nov 2025 – 15 Jan 2026) and ten through the monsoon (20 Jun – 18 Oct 2026). For the polarisation study we also used the descending track 120/76, which has all four polarisations (full-pol).</li>
+<li><b>NISAR S-band</b> (Bhoonidhi, NRSC/ISRO). Same ascending track, HH and HV at 10 m, 9 dates Jul–Oct 2026; 8 of them were captured at the same time as L-band. Descending compact-pol data for the polarisation study. The S-band files are large (12.6 GB) and downloaded slowly, so only the 20 km reference box was read for S-band.</li>
+<li><b>Reference data (only for training and checking, never as model input):</b> Sentinel-2 images within 3 days of a NISAR date, cloud-masked, with water defined by the MNDWI water index (MNDWI &gt; 0); 5 dates were cloud-free (none in the monsoon). Sentinel-1 radar water maps were used only as a comparison on monsoon dates. Persistent water = water on at least 4 of the 5 dry-season NISAR dates, or water in at least 50 % of years in the JRC Global Surface Water record.</li>
+</ul>
+
+<h2>2. Method</h2>
+<p><b>Preprocessing.</b> Invalid pixels are removed with the product's mask layer, radar speckle is reduced with a 7×7 Lee filter, and backscatter is converted to decibels (γ0 dB).</p>
+<p><b>Water classifier.</b> A LightGBM machine-learning model labels each pixel water or not water using only NISAR information: HH backscatter measured relative to each date's own water/land threshold, local texture (averages and variation in small windows), how each pixel behaves across all 15 dates, and terrain height above the nearest drainage (HAND). Expressing backscatter relative to each date's threshold lets the model handle the monsoon, when water looks 3–5 dB brighter at L-band because of wind, rain and shallow water among crops. Small water patches under 0.25 ha are removed.</p>
+<p><b>Training and testing.</b> Inside the 20 km reference box we divided the area into 2 km blocks and used them for training, tuning and a separate 30 % test set that the model never saw. All accuracy numbers below are on these test blocks, with 95 % confidence intervals from resampling the test blocks. We chose this model because it clearly beat simpler threshold methods on the same test blocks (F1 0.832 vs 0.759).</p>
+<p><b>Change detection.</b> The water maps of two dates are compared pixel by pixel into four classes: stable water, newly detected water (gain), water loss and stable non-water. <b>New water</b> is gain outside persistent water.</p>
+<p><b>Full scene.</b> The trained model was applied to the whole NISAR scene (about 64,000 km²) in 20 km tiles. To fit laptop computing, features are computed at 10 m and the map is produced at 20 m. Each date's water/land threshold is taken from the reference box (minus 1 dB) for the whole scene. A strip along the scene edge that has almost no signal on the dry-season images is masked out.</p>
+
+<h2>3. Results</h2>
+<p><b>Water maps (reference box, 10 m).</b> Test F1 <b>0.83</b> (precision 0.84, recall 0.84). The model avoids the main false alarms of simple thresholds, such as dry sand bars and smooth fields, and still follows the monsoon rise (agreement with Sentinel-1 water 0.74–0.82 on monsoon dates).</p>
+<div class="fig keep" style="max-width:68%;margin:4pt auto 6pt">
+  <figure><img src="fig_c3_2026-01-15.png"><figcaption>Water map, 15 Jan 2026 (reference box, 10 m).</figcaption></figure>
+  <figure><img src="fig_new_water.png"><figcaption>Newly detected water outside persistent water, 15 Jan → 12 Sep 2026 (reference box).</figcaption></figure>
+</div>
+<p><b>Change and new water (reference box).</b> Compared with change seen by Sentinel-2, the change maps are 95 % correct overall (gain F1 0.72 on the pair with most real change).</p>
+<table class="keep">
+<tr><th>Reference box, date pair</th><th class="n">Stable water (km²)</th><th class="n">Gain (km²)</th><th class="n">Loss (km²)</th><th class="n">New water outside persistent (km²)</th></tr>
+<tr><td>Dry season 28 Nov 2025 → 15 Jan 2026</td><td class="n">32.5</td><td class="n">1.1</td><td class="n">20.9</td><td class="n">0.9</td></tr>
+<tr><td>Dry season → monsoon peak 15 Jan → 12 Sep 2026</td><td class="n">32.4</td><td class="n">130.9</td><td class="n">1.1</td><td class="n">129.6</td></tr>
+<tr><td>Peak → recession 12 Sep → 18 Oct 2026</td><td class="n">73.2</td><td class="n">3.7</td><td class="n">90.2</td><td class="n">3.5</td></tr>
+<tr><td>Dry season → after the monsoon 15 Jan → 18 Oct 2026</td><td class="n">31.1</td><td class="n">45.8</td><td class="n">2.5</td><td class="n">44.6</td></tr>
+</table>
+<p class="note">Areas = number of pixels × pixel area on the UTM 45N grid. Gain is reported as newly detected water; its pattern (low-lying floodplain and old river loops) fits seasonal flooding, but the maps alone do not prove the cause (rain, river overflow or irrigation).</p>
+
+<p><b>L-band vs S-band vs combined L+S.</b> On the 8 dates with both bands, each band was processed in exactly the same way and the same model was trained on L, S or both (truth available on 18 Oct 2026).</p>
+<table class="keep">
+<tr><th>Data used</th><th class="n">Test F1</th><th class="n">Precision</th><th class="n">Recall</th><th class="n">Difference vs L-band (95 %)</th></tr>
+<tr><td>L-band</td><td class="n">0.807</td><td class="n">0.81</td><td class="n">0.81</td><td class="n">—</td></tr>
+<tr><td>S-band</td><td class="n">0.808</td><td class="n">0.84</td><td class="n">0.78</td><td class="n">+0.002 [−0.031, +0.040]</td></tr>
+<tr><td>L + S combined</td><td class="n">0.826</td><td class="n">0.87</td><td class="n">0.79</td><td class="n">+0.018 [+0.002, +0.041]</td></tr>
+</table>
+<p>S-band alone is as accurate as L-band. S-band makes fewer false alarms; L-band finds more water at vegetated edges, as expected from its longer wavelength. Combining the bands improves F1 a little, mainly by removing false alarms, but on 24 Sep 2026 (both bands 1.5–1.8 dB brighter, probably wind or rain) the combined map doubled the water area (258 vs 130 km² in Sentinel-1). Because the gain is small, measured on one date, and S-band covers only the reference box, the final maps use L-band alone.</p>
+<div class="fig keep"><figure style="max-width:82%;margin:0 auto"><img src="fig_fusion.png"><figcaption>Left: test F1 on 18 Oct 2026 with 95 % intervals. Right: water area per date for L, S and L+S, with Sentinel-1 for comparison.</figcaption></figure></div>
+
+<p><b>Polarisation.</b> With all four L-band polarisations (descending full-pol), F1 rises from 0.795 to 0.814. Almost all of the gain comes from the VV channel (and the Pauli surface component, which is mostly VV). Entropy/alpha and model-based decompositions add little, because water returns a very weak, noise-like signal in the HV and VV channels. In S-band compact-pol, total power separates water well (agreement with Sentinel-1 F1 0.85); the other compact-pol measures do not. We also found and corrected an HH–VV phase offset in the delivered full-pol product before computing decompositions.</p>
+
+<p><b>Full NISAR scene (20 m).</b> Checked against a Sentinel-2 water map of the whole scene for 15 Jan 2026: F1 <b>0.81</b> in the Ganga floodplain belt (north of 2,775 km northing; precision 0.78, recall 0.83), 0.47 on the plain south of the river (precision 0.33), 0.60 for the whole scene and 0.85 inside the reference box. Floodplain water grows from 694–1,030 km² in the dry season to 4,037 km² at the 12 Sep peak and falls to 1,260 km² by 18 Oct; on monsoon dates it is 1.2–1.4 times the Sentinel-1 estimate.</p>
+<div class="fig keep"><figure style="max-width:62%;margin:0 auto"><img src="fig_footprint.png" alt="Full-scene new water map and water area per date by zone"><figcaption>Left: newly detected water outside persistent water, 15 Jan → 12 Sep 2026, full scene. Right: water area per date, floodplain belt and southern plain.</figcaption></figure></div>
+<table class="keep">
+<tr><th>Floodplain belt, full scene, date pair</th><th class="n">Stable water (km²)</th><th class="n">Gain (km²)</th><th class="n">Loss (km²)</th><th class="n">New water outside persistent (km²)</th></tr>
+<tr><td>Dry season → monsoon peak 15 Jan → 12 Sep 2026</td><td class="n">601</td><td class="n">3,203</td><td class="n">31</td><td class="n">3,048</td></tr>
+<tr><td>Peak → recession 12 Sep → 18 Oct 2026</td><td class="n">1,194</td><td class="n">66</td><td class="n">2,772</td><td class="n">57</td></tr>
+<tr><td>Dry season → after the monsoon 15 Jan → 18 Oct 2026</td><td class="n">542</td><td class="n">665</td><td class="n">90</td><td class="n">574</td></tr>
+</table>
+
+<h2>4. Uncertainty and limitations</h2>
+<ul>
+<li><b>Monsoon accuracy is not directly measured:</b> there were no cloud-free Sentinel-2 images from June to mid-October, so monsoon maps are only compared with Sentinel-1, which is a different sensor, not the truth.</li>
+<li><b>The reference has errors too:</b> Sentinel-2 can call wet sand or shadows water and misses water under vegetation, and its images can be up to 3 days from the NISAR date.</li>
+<li><b>Main error sources:</b> dark, dry, smooth fields and sand (false water), wind-roughened or vegetated water (missed water), mixed pixels at channel edges, and the radar noise floor in the HV and VV channels.</li>
+<li><b>Outside the training area:</b> the model was trained in the reference box. It works well in the Ganga floodplain but still over-maps dark, dry fields on the southern plain (precision 0.33); southern-plain areas should be treated as indicative. Training with samples from that landscape is the next step.</li>
+<li><b>S-band and L+S</b> cover only the reference box, and their comparison rests on one date with optical truth.</li>
+</ul>
+
+<h2>5. Reproducibility and software</h2>
+<p>Every step is a script driven by a YAML configuration (<code>uv run nisar-water run</code>), writing time-stamped outputs with the exact settings, input granules, code version, accuracy tables, GeoTIFF maps and map images labelled with date, coordinate system, resolution and source. Unit tests cover the data reader, accuracy metrics, change classes and polarimetric features. Software: Python 3.12, h5py, numpy, scipy, xarray, rasterio, scikit-image, scikit-learn, LightGBM, pysheds, pystac-client / Planetary Computer, earthaccess, asf_search, matplotlib; third-party code: <i>nisar-polarimetric-training</i> (D. K. Pandey, Apache-2.0) for GCOV access and decompositions.</p>
+<p class="note" style="font-size:7.6pt;line-height:1.25"><b>References.</b> Chini et al. 2017, IEEE TGRS 55(12) · Cloude &amp; Pottier 1997, IEEE TGRS 35(1) · Freeman &amp; Durden 1998, IEEE TGRS 36(3) · Ke et al. 2017 (LightGBM), NeurIPS · Lee 1980, IEEE TPAMI 2(2) · Martinis et al. 2009, NHESS 9 · Pekel et al. 2016, Nature 540 (JRC GSW) · Xu 2006, IJRS 27(14) (MNDWI). Data: NASA ASF DAAC (NISAR L2 GCOV, L-band); NRSC/ISRO Bhoonidhi (NISAR L2 GCOV, S-band); ESA Copernicus Sentinel-1/-2 and Copernicus DEM GLO-30 via Microsoft Planetary Computer; EC JRC Global Surface Water v1.3.</p>
+</body>
+</html>

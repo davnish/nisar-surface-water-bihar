@@ -1,0 +1,27 @@
+# data (only the reference bbox is tracked)
+data/raw/
+data/interim/
+data/processed/
+data/reference/*
+!data/reference/.gitkeep
+# experiment run artefacts: keep metrics/figures/reports, drop rasters
+experiments/*/runs/**/outputs/
+*.h5
+*.tif
+!tests/fixtures/*.tif
+# python / tooling
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+.env
+
+# Claude Code personal settings
+.claude/settings.local.json
+
+# credentials
+*.env
+bhoonidhi.env
+data/.bhoonidhi_token.json

@@ -1,0 +1,6 @@
+# Canonical development grid = the bbox window of the asc 98/14 GCOV frame (frequencyA, 10 m).
+# Verified in R00: every 98/14 granule shares this exact grid. 120/76 QPDH (20 m) pixels are
+# exact 2x2 aggregates of it. All reference layers in data/reference/ are on this grid.
+epsg: 32645
+transform: [10.0, 0.0, 439110.0, 0.0, -10.0, 2830440.0]   # affine a, b, c, d, e, f (pixel edges)
+shape: [2006, 2126]                                         # rows, cols

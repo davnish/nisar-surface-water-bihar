@@ -1,0 +1,7 @@
+2026-11-10 22:42:43,102 INFO running L10_full_footprint (production) -> /Users/nischal/satsure/nisar_analysis/experiments/L10_full_footprint/runs/20261110-224243
+2026-11-10 22:42:44,605 INFO frame (33696, 34344) at 10 m -> output (16848, 17172) at 20 m; 15 dates; model experiments/L07_supervised_rf_lgbm/runs/20261109-223929/outputs/lgbm_rel_nohand_mmu25/model.joblib (16 features, threshold 0.418)
+2026-11-10 22:42:49,565 INFO ENL per date: {'2025-11-28': np.float64(4.9), '2025-12-10': np.float64(4.95), '2025-12-22': np.float64(4.99), '2026-01-03': np.float64(4.98), '2026-01-15': np.float64(4.93), '2026-06-20': np.float64(4.97), '2026-07-02': np.float64(4.83), '2026-07-14': np.float64(4.93), '2026-07-26': np.float64(4.86), '2026-08-19': np.float64(4.76), '2026-08-31': np.float64(4.77), '2026-09-12': np.float64(4.81), '2026-09-24': np.float64(4.86), '2026-10-06': np.float64(4.95), '2026-10-18': np.float64(4.97)}
+2026-11-10 22:44:42,730 INFO edge mask (km² dropped per date): {'2025-11-28': 5198.4, '2025-12-10': 5016.2, '2025-12-22': 5270.7, '2026-01-03': 4962.4, '2026-01-15': 5021.9, '2026-06-20': 0.0, '2026-07-02': 0.0, '2026-07-14': 0.0, '2026-07-26': 0.0, '2026-08-19': 0.0, '2026-08-31': 0.0, '2026-09-12': 0.0, '2026-09-24': 0.0, '2026-10-06': 0.0, '2026-10-18': 0.0}
+2026-11-10 22:45:36,565 INFO merged label stacks of 5 shards
+2026-11-10 22:45:36,568 INFO bbox at 10 m rows 7620.., cols 19431..; 0 tiles to process
+2026-11-10 22:47:23,265 INFO done: /Users/nischal/satsure/nisar_analysis/experiments/L10_full_footprint/runs/20261110-224243

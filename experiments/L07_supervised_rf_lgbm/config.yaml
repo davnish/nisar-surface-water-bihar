@@ -1,0 +1,190 @@
+# L07: supervised classifiers on a feature stack. Labels = S2 reference on TRAIN blocks (5 asc dates);
+# 25% of train blocks are held out as VAL for the probability threshold and model selection; TEST untouched.
+# Features: px = HH/HV/ratio; tex = + local mean/std/min (5x5, 15x15); full = + temporal stats over all 15
+# asc dates (reference-free) + HAND. lgbm_full_mmu25 adds the C2 post-processing.
+# Iteration 2: iteration 1 (lgbm_full, test F1 0.828) under-mapped monsoon water (S1 agreement 0.48 on 09-24)
+# because monsoon water is 3-5 dB brighter. *_rel features = HH features minus the scene's tiled-KI threshold.
+# rf_full / lgbm_px dropped (iteration 1 results kept in its run folder); *_nohand = production candidate.
+id: L07_supervised_rf_lgbm
+question: Does a supervised RF/LightGBM on multi-feature stacks beat the best unsupervised method?
+task: water_mask
+data:
+  band: L
+  granules:
+  - NISAR_L2_PR_GCOV_006_098_A_014_4005_DHDH_A_20251128T233812_20251128T233847_X05009_N_F_J_001
+  - NISAR_L2_PR_GCOV_007_098_A_014_4005_DHDH_A_20251210T233813_20251210T233847_X05009_N_F_J_001
+  - NISAR_L2_PR_GCOV_008_098_A_014_4005_DHDH_A_20251222T233813_20251222T233848_X05009_N_F_J_001
+  - NISAR_L2_PR_GCOV_009_098_A_014_4005_DHDH_A_20260103T233814_20260103T233848_X05009_N_F_J_001
+  - NISAR_L2_PR_GCOV_010_098_A_014_4005_DHDH_A_20260115T233815_20260115T233849_X05010_N_F_J_001
+  - NISAR_L2_PR_GCOV_023_098_A_014_4005_DHDH_A_20260620T233814_20260620T233849_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_024_098_A_014_4005_DHDH_A_20260702T233813_20260702T233848_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_025_098_A_014_4005_DHDH_A_20260714T233813_20260714T233847_P05023_F_F_J_001
+  - NISAR_L2_PR_GCOV_026_098_A_014_4005_DHDH_A_20260726T233812_20260726T233846_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_028_098_A_014_4005_DHDH_A_20260819T233811_20260819T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_029_098_A_014_4005_DHDH_A_20260831T233810_20260831T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_030_098_A_014_4005_DHDH_A_20260912T233810_20260912T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_031_098_A_014_4005_DHDH_A_20260924T233810_20260924T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_032_098_A_014_4005_DHDH_A_20261006T233810_20261006T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_033_098_A_014_4005_DHDH_A_20261018T233811_20261018T233845_P05023_N_F_J_001
+  frequency: frequencyA
+  terms:
+  - HHHH
+  - HVHV
+  extent: bbox
+preprocess:
+  speckle:
+    name: lee
+    size: 7
+    looks: auto
+validation:
+  reference: data/reference/s2_water_{date}.tif
+  split: test
+extra:
+  plot_date: '2026-01-15'
+  compare_reference: data/reference/s1_water_{date}.tif
+  stack:
+    texture: true
+    temporal: true
+    hand: true
+    relative:
+      tile: 256
+      n_tiles: 10
+      method: ki
+      bounded: true
+  val_fraction: 0.25
+  block_px: 200
+  samples_per_date: 150000
+  variants:
+  - name: C2
+    method: threshold
+    params:
+      kind: tiled
+      feature: HH
+      tiled:
+        tile: 256
+        n_tiles: 10
+        method: ki
+        bounded: true
+    refine:
+      mmu_px: 25
+  - name: lgbm_tex
+    method: supervised
+    params:
+      model: lgbm
+      features:
+      - HH
+      - HV
+      - HV-HH
+      - HH_m5
+      - HH_s5
+      - HH_m15
+      - HH_s15
+      - HH_min15
+      - HV_m15
+  - name: lgbm_full_mmu25
+    method: supervised
+    params:
+      model: lgbm
+      features:
+      - HH
+      - HV
+      - HV-HH
+      - HH_m5
+      - HH_s5
+      - HH_m15
+      - HH_s15
+      - HH_min15
+      - HV_m15
+      - HH_tmin
+      - HH_tmed
+      - HH_tmax
+      - HH_tstd
+      - HH_tfrac_dark
+      - HV_tmed
+      - HH_anom
+      - HAND
+    refine:
+      mmu_px: 25
+  - name: lgbm_rel_tex
+    method: supervised
+    params:
+      model: lgbm
+      features:
+      - HH_rel
+      - HH_m5_rel
+      - HH_m15_rel
+      - HH_min15_rel
+      - HH_s5
+      - HH_s15
+      - HV
+      - HV-HH
+      - HV_m15
+  - name: lgbm_rel_full
+    method: supervised
+    params:
+      model: lgbm
+      features:
+      - HH_rel
+      - HH_m5_rel
+      - HH_m15_rel
+      - HH_min15_rel
+      - HH_s5
+      - HH_s15
+      - HV
+      - HV-HH
+      - HV_m15
+      - HH_tmin
+      - HH_tmed
+      - HH_tmax
+      - HH_tstd
+      - HH_tfrac_dark
+      - HV_tmed
+      - HH_anom
+      - HAND
+  - name: lgbm_rel_full_mmu25
+    method: supervised
+    params:
+      model: lgbm
+      features:
+      - HH_rel
+      - HH_m5_rel
+      - HH_m15_rel
+      - HH_min15_rel
+      - HH_s5
+      - HH_s15
+      - HV
+      - HV-HH
+      - HV_m15
+      - HH_tmin
+      - HH_tmed
+      - HH_tmax
+      - HH_tstd
+      - HH_tfrac_dark
+      - HV_tmed
+      - HH_anom
+      - HAND
+    refine:
+      mmu_px: 25
+  - name: lgbm_rel_nohand_mmu25
+    method: supervised
+    params:
+      model: lgbm
+      features:
+      - HH_rel
+      - HH_m5_rel
+      - HH_m15_rel
+      - HH_min15_rel
+      - HH_s5
+      - HH_s15
+      - HV
+      - HV-HH
+      - HV_m15
+      - HH_tmin
+      - HH_tmed
+      - HH_tmax
+      - HH_tstd
+      - HH_tfrac_dark
+      - HV_tmed
+      - HH_anom
+    refine:
+      mmu_px: 25

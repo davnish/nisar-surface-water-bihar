@@ -1,0 +1,10 @@
+id: L00_data_inventory
+question: "Which L2 GCOV granules, modes, pols and dates cover the AOI, and which dates should we use?"
+task: inventory
+data:
+  band: L
+extra:
+  start: null            # ISO date; null = whole archive
+  end: null
+  min_bbox_cover: 0.0    # drop granules covering less than this fraction of the reference bbox
+  profile_metadata: true # stream HDF5 metadata of one granule per track/frame/mode (no rasters)

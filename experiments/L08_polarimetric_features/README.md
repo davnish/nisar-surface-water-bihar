@@ -1,0 +1,181 @@
+# L08_polarimetric_features
+
+**Status:** done  <!-- planned | running | done | abandoned -->
+**Decision:** full-pol adds measurable value, almost entirely through **VV** (co-pol): test F1 0.814 vs 0.795 dual-pol (with texture), 0.767 vs 0.712 (pixel features). Eigen/model decompositions add little (noise-limited over water). Not adopted for the main series because no QP mode exists on asc 98/14 (dual-pol only)  <!-- adopt | reject | iterate — one line why -->
+**Owner / date:** nischal, 2026-11-09
+
+## Question / hypothesis
+Task H(ii): do full-polarimetric L-band observations improve water/non-water discrimination over the dual-pol (HH/HV) baseline, under identical dates, geometry, samples, split and classifier? Which descriptors carry the signal?
+
+## Data
+- Desc 120/76, mode 2005 QPDH, frequency A: 10 covariance terms (HHHH, HHHV, HHVH, HHVV, HVHV, HVVH, HVVV, VHVH, VHVV, VVVV), 20 m posting, streamed bbox windows.
+- Dates: 2025-11-30, 2026-01-05, 2026-01-17, 2026-06-22 (S2 reference) and 2026-09-14 (monsoon; S1 comparison only).
+- The 20 m windows are exact 2×2 aggregates of the canonical 10 m grid shifted by one 10 m column; features are computed at 20 m and replicated onto the 10 m grid (no interpolation) so the R00 references and blocks apply unchanged.
+
+## Method & parameters
+`features/polsar.py`:
+1. Boxcar 3×3 (60 m) on every covariance term (real/imag separately).
+2. **Reciprocal symmetrisation** (GCOV `polarimetricSymmetrizationApplied = False`): S_X = (S_HV + S_VH)/2. The delivered HV/VH power ratio is 0.89–1.03 (median per date).
+3. **Co-pol phase calibration on distributed targets:** on coherent pixels (|γ_HHVV| > 0.6) the HH–VV phase should be ≈ 0° for surface-like scattering, but the delivered terms show a large scene-wide offset: −154.8°, −159.5°, −158.6° (dry season), +68.8° (06-22), −116.8° (09-14). Uncorrected, Pauli / H-α / Freeman–Durden would report surface scattering as double bounce (land α ≈ 67°). The circular-mean offset is removed from HHVV and HVVV before decomposition; after correction land has α ≈ 26° and Freeman–Durden surface fraction 0.58 (physically plausible). The varying offset suggests a residual co-pol phase calibration term in these early products (to report to the data provider).
+4. Descriptors (vendored nisar-polarimetric-training): HH, HV, VV (dB), VV−HH, HV−VV, HV−HH, span, co-pol coherence and phase, Cloude–Pottier H/A/ᾱ (from T3), Pauli powers, Freeman–Durden fractions.
+5. Same supervised setup as L07 (LightGBM, TRAIN-block samples, VAL-block threshold/model selection, TEST scoring). Unit tests: pure surface → H ≈ 0, α ≈ 0°; dihedral → α ≈ 90°.
+
+Feature sets: **HH**; **dual** = HH, HV, HV−HH (what DHDH provides); **copol** = HH, VV, VV−HH, coherence, phase; **full** = all descriptors; each also **+ texture** (HH local mean/std/min, HV local mean).
+
+## Baseline compared against
+`lgbm_dual` / `lgbm_dual_tex` (the dual-pol subset of the same products) and HH thresholds, on identical samples and blocks.
+
+## Results
+Auto-filled by `uv run nisar-water report <ID>` from the latest run. Do not edit inside the markers.
+<!-- RESULTS:START -->
+Run: `experiments/L08_polarimetric_features/runs/20261109-233411`
+
+**Headline:** selected variant = lgbm_full_tex (chosen on val; test F1 pooled) = 0.8144
+
+| metric | value |
+|---|---|
+| best_variant | lgbm_full_tex |
+
+**Test-block scores by variant (mean over dates, and pooled confusion matrix)**
+
+| variant          |   f1_mean |   iou_mean |   precision_mean |   recall_mean |   f1_pooled |   iou_pooled |   val_f1_pooled |
+|:-----------------|----------:|-----------:|-----------------:|--------------:|------------:|-------------:|----------------:|
+| lgbm_full_tex    |     0.795 |      0.662 |            0.808 |         0.785 |       0.814 |        0.687 |           0.801 |
+| lgbm_dual_tex    |     0.775 |      0.635 |            0.793 |         0.759 |       0.795 |        0.660 |           0.782 |
+| lgbm_full        |     0.744 |      0.595 |            0.813 |         0.695 |       0.767 |        0.622 |           0.759 |
+| lgbm_copol       |     0.738 |      0.587 |            0.826 |         0.676 |       0.761 |        0.614 |           0.755 |
+| lgbm_dual        |     0.690 |      0.530 |            0.797 |         0.618 |       0.712 |        0.553 |           0.722 |
+| B_HH_tuned       |     0.685 |      0.525 |            0.799 |         0.610 |       0.707 |        0.547 |           0.719 |
+| lgbm_HH          |     0.684 |      0.524 |            0.787 |         0.617 |       0.708 |        0.548 |           0.719 |
+| B_HH_tiled_mmu25 |     0.493 |      0.361 |            0.733 |         0.608 |       0.205 |        0.114 |           0.218 |
+
+**Agreement with comparison reference (F1, all pixels; consistency, not accuracy)**
+
+| date       |   B_HH_tiled_mmu25 |   B_HH_tuned |   lgbm_HH |   lgbm_copol |   lgbm_dual |   lgbm_dual_tex |   lgbm_full |   lgbm_full_tex |
+|:-----------|-------------------:|-------------:|----------:|-------------:|------------:|----------------:|------------:|----------------:|
+| 2025-11-30 |              0.651 |        0.729 |     0.731 |        0.704 |       0.729 |           0.720 |       0.692 |           0.706 |
+| 2026-01-05 |              0.431 |        0.522 |     0.528 |        0.509 |       0.530 |           0.551 |       0.522 |           0.546 |
+| 2026-01-17 |              0.538 |        0.639 |     0.644 |        0.631 |       0.644 |           0.647 |       0.637 |           0.645 |
+| 2026-06-22 |              0.171 |        0.592 |     0.599 |        0.579 |       0.574 |           0.517 |       0.572 |           0.478 |
+| 2026-09-14 |              0.851 |        0.838 |     0.841 |        0.842 |       0.832 |           0.770 |       0.845 |           0.807 |
+
+**Mapped water area per date (km²)**
+
+| date       |   B_HH_tiled_mmu25 |   B_HH_tuned |   lgbm_HH |   lgbm_copol |   lgbm_dual |   lgbm_dual_tex |   lgbm_full |   lgbm_full_tex |   comparison_reference_km2 |
+|:-----------|-------------------:|-------------:|----------:|-------------:|------------:|----------------:|------------:|----------------:|---------------------------:|
+| 2025-11-30 |               26.2 |         36.6 |      37.2 |         40.8 |        37.5 |            47.6 |        44.6 |            48.6 |                       50.8 |
+| 2026-01-05 |               19.0 |         25.4 |      25.9 |         25.2 |        26.0 |            30.1 |        26.1 |            30.0 |                       66.4 |
+| 2026-01-17 |               16.6 |         23.5 |      24.0 |         23.7 |        23.9 |            27.5 |        24.1 |            27.3 |                       43.1 |
+| 2026-06-22 |              403.2 |         19.1 |      19.9 |         18.4 |        18.4 |            16.3 |        18.2 |            14.6 |                       38.0 |
+| 2026-09-14 |              145.3 |        132.8 |     134.3 |        168.7 |       129.4 |           125.1 |       164.4 |           154.9 |                      153.1 |
+
+**Per-feature separability on TRAIN pixels (JM, best single-threshold F1)**
+
+| feature               |    jm |   best_f1_train |   threshold | water_is   |   water_p50 |   land_p50 |
+|:----------------------|------:|----------------:|------------:|:-----------|------------:|-----------:|
+| pauli_surface         | 1.069 |           0.875 |     -10.735 | <          |     -18.645 |     -7.222 |
+| VV                    | 1.058 |           0.870 |     -12.577 | <          |     -19.944 |     -9.120 |
+| span                  | 0.956 |           0.864 |      -9.214 | <          |     -15.717 |     -5.831 |
+| HH                    | 0.846 |           0.855 |     -12.828 | <          |     -18.762 |     -9.338 |
+| pauli_volume          | 0.619 |           0.811 |     -22.910 | <          |     -26.114 |    -18.527 |
+| HV                    | 0.618 |           0.810 |     -25.930 | <          |     -29.118 |    -21.541 |
+| pauli_double          | 0.486 |           0.794 |     -16.849 | <          |     -20.021 |    -13.820 |
+| alpha_deg             | 0.347 |           0.740 |      28.788 | >          |      46.564 |     25.896 |
+| copol_coh             | 0.312 |           0.737 |       0.548 | <          |       0.269 |      0.641 |
+| fd_double_bounce_frac | 0.179 |           0.732 |       0.140 | >          |       0.277 |      0.099 |
+| H                     | 0.228 |           0.722 |       0.622 | >          |       0.797 |      0.583 |
+| fd_surface_frac       | 0.261 |           0.717 |       0.605 | <          |       0.262 |      0.629 |
+| fd_volume_frac        | 0.095 |           0.687 |       0.087 | >          |       0.408 |      0.253 |
+| HV-VV                 | 0.122 |           0.687 |     -16.214 | >          |      -8.747 |    -11.820 |
+| HV-HH                 | 0.085 |           0.681 |     -16.614 | >          |      -9.856 |    -11.476 |
+| A                     | 0.030 |           0.672 |       0.899 | <          |       0.500 |      0.474 |
+| VV-HH                 | 0.035 |           0.667 |      -7.015 | >          |      -0.925 |      0.083 |
+| copol_phase_deg       | 0.338 |           0.663 |    -177.947 | >          |      -3.253 |     -1.012 |
+
+**Feature importance (gain share)**
+
+|                       |   lgbm_HH |   lgbm_dual |   lgbm_copol |   lgbm_full |   lgbm_dual_tex |   lgbm_full_tex |
+|:----------------------|----------:|------------:|-------------:|------------:|----------------:|----------------:|
+| HH                    |     1.000 |       0.091 |        0.145 |       0.015 |           0.183 |           0.005 |
+| HV                    |   nan     |       0.663 |      nan     |       0.014 |           0.019 |           0.007 |
+| HV-HH                 |   nan     |       0.246 |      nan     |       0.009 |           0.012 |           0.004 |
+| VV                    |   nan     |     nan     |        0.724 |       0.255 |         nan     |           0.107 |
+| copol_coh             |   nan     |     nan     |        0.045 |       0.013 |         nan     |           0.007 |
+| VV-HH                 |   nan     |     nan     |        0.043 |       0.028 |         nan     |           0.016 |
+| copol_phase_deg       |   nan     |     nan     |        0.043 |       0.021 |         nan     |           0.007 |
+| pauli_surface         |   nan     |     nan     |      nan     |       0.535 |         nan     |           0.220 |
+| A                     |   nan     |     nan     |      nan     |       0.021 |         nan     |           0.007 |
+| alpha_deg             |   nan     |     nan     |      nan     |       0.017 |         nan     |           0.010 |
+| fd_double_bounce_frac |   nan     |     nan     |      nan     |       0.014 |         nan     |           0.007 |
+| H                     |   nan     |     nan     |      nan     |       0.011 |         nan     |           0.005 |
+| pauli_double          |   nan     |     nan     |      nan     |       0.010 |         nan     |           0.005 |
+| HV-VV                 |   nan     |     nan     |      nan     |       0.009 |         nan     |           0.004 |
+| span                  |   nan     |     nan     |      nan     |       0.009 |         nan     |           0.005 |
+| fd_volume_frac        |   nan     |     nan     |      nan     |       0.007 |         nan     |           0.003 |
+| fd_surface_frac       |   nan     |     nan     |      nan     |       0.007 |         nan     |           0.003 |
+| pauli_volume          |   nan     |     nan     |      nan     |       0.003 |         nan     |           0.002 |
+| HH_min15              |   nan     |     nan     |      nan     |     nan     |           0.498 |           0.446 |
+| HH_m5                 |   nan     |     nan     |      nan     |     nan     |           0.129 |           0.009 |
+| HH_s15                |   nan     |     nan     |      nan     |     nan     |           0.055 |           0.036 |
+| HH_s5                 |   nan     |     nan     |      nan     |     nan     |           0.052 |           0.047 |
+| HH_m15                |   nan     |     nan     |      nan     |     nan     |           0.028 |           0.020 |
+| HV_m15                |   nan     |     nan     |      nan     |     nan     |           0.023 |           0.017 |
+
+**Per date**
+
+| variant          | date       |   threshold_db |    f1 |   iou |   precision |   recall |   water_km2 |
+|:-----------------|:-----------|---------------:|------:|------:|------------:|---------:|------------:|
+| B_HH_tiled_mmu25 | 2025-11-30 |        -18.836 | 0.646 | 0.477 |       0.981 |    0.482 |      26.167 |
+| B_HH_tiled_mmu25 | 2026-01-05 |        -17.769 | 0.612 | 0.440 |       0.950 |    0.451 |      18.968 |
+| B_HH_tiled_mmu25 | 2026-01-17 |        -18.415 | 0.669 | 0.503 |       0.977 |    0.509 |      16.624 |
+| B_HH_tiled_mmu25 | 2026-06-22 |         -4.104 | 0.046 | 0.024 |       0.024 |    0.989 |     403.219 |
+| B_HH_tuned       | 2025-11-30 |        -16.285 | 0.729 | 0.574 |       0.888 |    0.619 |      36.607 |
+| B_HH_tuned       | 2026-01-05 |        -16.285 | 0.684 | 0.520 |       0.875 |    0.562 |      25.397 |
+| B_HH_tuned       | 2026-01-17 |        -16.285 | 0.747 | 0.596 |       0.883 |    0.648 |      23.496 |
+| B_HH_tuned       | 2026-06-22 |        -16.285 | 0.580 | 0.408 |       0.551 |    0.611 |      19.137 |
+| lgbm_HH          | 2025-11-30 |        nan     | 0.731 | 0.576 |       0.881 |    0.625 |      37.176 |
+| lgbm_HH          | 2026-01-05 |        nan     | 0.687 | 0.523 |       0.867 |    0.569 |      25.944 |
+| lgbm_HH          | 2026-01-17 |        nan     | 0.748 | 0.598 |       0.875 |    0.654 |      23.957 |
+| lgbm_HH          | 2026-06-22 |        nan     | 0.570 | 0.399 |       0.526 |    0.622 |      19.885 |
+| lgbm_dual        | 2025-11-30 |        nan     | 0.734 | 0.579 |       0.878 |    0.630 |      37.504 |
+| lgbm_dual        | 2026-01-05 |        nan     | 0.692 | 0.529 |       0.873 |    0.573 |      25.986 |
+| lgbm_dual        | 2026-01-17 |        nan     | 0.747 | 0.596 |       0.879 |    0.649 |      23.889 |
+| lgbm_dual        | 2026-06-22 |        nan     | 0.588 | 0.417 |       0.560 |    0.619 |      18.397 |
+| lgbm_copol       | 2025-11-30 |        nan     | 0.803 | 0.671 |       0.891 |    0.731 |      40.755 |
+| lgbm_copol       | 2026-01-05 |        nan     | 0.712 | 0.553 |       0.879 |    0.598 |      25.193 |
+| lgbm_copol       | 2026-01-17 |        nan     | 0.766 | 0.621 |       0.892 |    0.672 |      23.691 |
+| lgbm_copol       | 2026-06-22 |        nan     | 0.671 | 0.505 |       0.642 |    0.702 |      18.421 |
+| lgbm_full        | 2025-11-30 |        nan     | 0.806 | 0.676 |       0.846 |    0.770 |      44.569 |
+| lgbm_full        | 2026-01-05 |        nan     | 0.723 | 0.567 |       0.879 |    0.615 |      26.062 |
+| lgbm_full        | 2026-01-17 |        nan     | 0.776 | 0.634 |       0.895 |    0.684 |      24.075 |
+| lgbm_full        | 2026-06-22 |        nan     | 0.669 | 0.502 |       0.632 |    0.709 |      18.189 |
+| lgbm_dual_tex    | 2025-11-30 |        nan     | 0.816 | 0.689 |       0.833 |    0.799 |      47.640 |
+| lgbm_dual_tex    | 2026-01-05 |        nan     | 0.774 | 0.632 |       0.829 |    0.726 |      30.135 |
+| lgbm_dual_tex    | 2026-01-17 |        nan     | 0.818 | 0.692 |       0.852 |    0.787 |      27.527 |
+| lgbm_dual_tex    | 2026-06-22 |        nan     | 0.691 | 0.528 |       0.660 |    0.725 |      16.271 |
+| lgbm_full_tex    | 2025-11-30 |        nan     | 0.842 | 0.727 |       0.841 |    0.843 |      48.553 |
+| lgbm_full_tex    | 2026-01-05 |        nan     | 0.785 | 0.646 |       0.840 |    0.737 |      30.010 |
+| lgbm_full_tex    | 2026-01-17 |        nan     | 0.826 | 0.704 |       0.862 |    0.793 |      27.280 |
+| lgbm_full_tex    | 2026-06-22 |        nan     | 0.726 | 0.570 |       0.689 |    0.768 |      14.634 |
+
+Figures:
+- [f1_by_date.png](runs/20261109-233411/figures/f1_by_date.png)
+- [water_B_HH_tiled_mmu25_2026-01-17.png](runs/20261109-233411/figures/water_B_HH_tiled_mmu25_2026-01-17.png)
+- [water_B_HH_tuned_2026-01-17.png](runs/20261109-233411/figures/water_B_HH_tuned_2026-01-17.png)
+- [water_lgbm_HH_2026-01-17.png](runs/20261109-233411/figures/water_lgbm_HH_2026-01-17.png)
+- [water_lgbm_copol_2026-01-17.png](runs/20261109-233411/figures/water_lgbm_copol_2026-01-17.png)
+- [water_lgbm_dual_2026-01-17.png](runs/20261109-233411/figures/water_lgbm_dual_2026-01-17.png)
+- [water_lgbm_dual_tex_2026-01-17.png](runs/20261109-233411/figures/water_lgbm_dual_tex_2026-01-17.png)
+- [water_lgbm_full_2026-01-17.png](runs/20261109-233411/figures/water_lgbm_full_2026-01-17.png)
+- [water_lgbm_full_tex_2026-01-17.png](runs/20261109-233411/figures/water_lgbm_full_tex_2026-01-17.png)
+<!-- RESULTS:END -->
+
+## Observations and failure modes
+- **Full-pol > dual-pol**, beyond the 0.01 promotion margin: +0.055 F1 with pixel features (0.767 vs 0.712) and +0.019 with texture (0.814 vs 0.795). The co-pol set alone (HH, VV, ratio, coherence, phase) reaches 0.761, so **VV is the useful extra channel**. Single-feature separability (train pixels): Pauli surface |HH+VV|² (JM 1.07) and VV (1.06) > span (0.96) > HH (0.85) ≫ HV (0.62) > α (0.35), H (0.23), Freeman–Durden fractions (≤ 0.26).
+- Over water every cross-pol and decomposition descriptor is dominated by the **uncorrected noise floor** (HV ≈ −29 dB, H ≈ 0.8–0.9, "volume" ≈ 0.4–0.75): water looks like random scattering. The decompositions therefore add little beyond VV.
+- Importance (full + texture): HH local minimum 45 %, Pauli surface 22 %, VV 11 %; all eigen/model descriptors < 2 % each.
+- The reference-free tiled-KI baseline **failed** on the low-water pre-monsoon date 2026-06-22 (S2 water only 8 km²): the most bimodal tiles split land from bright targets (t = −4.1 dB, 403 km² mapped). This failure mode also motivated the threshold plausibility bounds in L10 production.
+- Absolute F1 here (0.81) is below the asc DHDH result (0.83, L07) — different geometry (descending), 20 m posting, fewer and different dates, and no temporal features; compare only within this experiment.
+
+## Decision
+Report as the Task H result: on this AOI L-band full-pol improves water mapping by ~0.02–0.05 F1, through the co-pol VV channel; H/A/α and Freeman–Durden are not useful for water at the current noise floor. The main series (asc 98/14) is dual-pol only, so C3 remains the production method.

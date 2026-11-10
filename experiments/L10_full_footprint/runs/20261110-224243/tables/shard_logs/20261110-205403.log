@@ -1,0 +1,44 @@
+2026-11-10 20:54:03,689 INFO running L10_full_footprint (production) -> /Users/nischal/satsure/nisar_analysis/experiments/L10_full_footprint/runs/20261110-205403
+2026-11-10 20:54:05,001 INFO frame (33696, 34344) at 10 m -> output (16848, 17172) at 20 m; 15 dates; model experiments/L07_supervised_rf_lgbm/runs/20261109-223929/outputs/lgbm_rel_nohand_mmu25/model.joblib (16 features, threshold 0.418)
+2026-11-10 20:54:10,528 INFO ENL per date: {'2025-11-28': np.float64(4.9), '2025-12-10': np.float64(4.95), '2025-12-22': np.float64(4.99), '2026-01-03': np.float64(4.98), '2026-01-15': np.float64(4.93), '2026-06-20': np.float64(4.97), '2026-07-02': np.float64(4.83), '2026-07-14': np.float64(4.93), '2026-07-26': np.float64(4.86), '2026-08-19': np.float64(4.76), '2026-08-31': np.float64(4.77), '2026-09-12': np.float64(4.81), '2026-09-24': np.float64(4.86), '2026-10-06': np.float64(4.95), '2026-10-18': np.float64(4.97)}
+2026-11-10 20:56:20,428 INFO edge mask (km² dropped per date): {'2025-11-28': 5198.4, '2025-12-10': 5016.2, '2025-12-22': 5270.7, '2026-01-03': 4962.4, '2026-01-15': 5021.9, '2026-06-20': 0.0, '2026-07-02': 0.0, '2026-07-14': 0.0, '2026-07-26': 0.0, '2026-08-19': 0.0, '2026-08-31': 0.0, '2026-09-12': 0.0, '2026-09-24': 0.0, '2026-10-06': 0.0, '2026-10-18': 0.0}
+2026-11-10 20:56:23,193 INFO bbox at 10 m rows 7620.., cols 19431..; 57 tiles to process
+2026-11-10 20:57:48,467 INFO tile 6/57 (2048,24576) done; 1 processed, 85 s elapsed
+2026-11-10 20:58:31,310 INFO tile 8/57 (4096,10240) done; 2 processed, 128 s elapsed
+2026-11-10 21:01:50,361 INFO tile 9/57 (4096,20480) done; 3 processed, 327 s elapsed
+2026-11-10 21:03:18,387 INFO tile 11/57 (6144,6144) done; 4 processed, 415 s elapsed
+2026-11-10 21:06:35,721 INFO tile 12/57 (6144,16384) done; 5 processed, 613 s elapsed
+2026-11-10 21:08:24,838 INFO tile 13/57 (6144,26624) done; 6 processed, 722 s elapsed
+2026-11-10 21:10:50,202 INFO tile 14/57 (8192,2048) done; 7 processed, 867 s elapsed
+2026-11-10 21:14:21,219 INFO tile 15/57 (8192,12288) done; 8 processed, 1078 s elapsed
+2026-11-10 21:17:59,943 INFO tile 16/57 (8192,22528) done; 9 processed, 1297 s elapsed
+2026-11-10 21:21:34,747 INFO tile 18/57 (10240,8192) done; 10 processed, 1512 s elapsed
+2026-11-10 21:25:35,376 INFO tile 19/57 (10240,18432) done; 11 processed, 1752 s elapsed
+2026-11-10 21:27:10,573 INFO tile 20/57 (10240,28672) done; 12 processed, 1847 s elapsed
+2026-11-10 21:31:24,723 INFO tile 21/57 (12288,4096) done; 13 processed, 2102 s elapsed
+2026-11-10 21:35:10,007 INFO tile 22/57 (12288,14336) done; 14 processed, 2327 s elapsed
+2026-11-10 21:38:14,202 INFO tile 23/57 (12288,24576) done; 15 processed, 2511 s elapsed
+2026-11-10 21:43:25,973 INFO tile 25/57 (14336,10240) done; 16 processed, 2823 s elapsed
+2026-11-10 21:48:12,300 INFO tile 26/57 (14336,20480) done; 17 processed, 3109 s elapsed
+2026-11-10 21:49:09,587 INFO tile 27/57 (14336,30720) done; 18 processed, 3166 s elapsed
+2026-11-10 21:52:28,688 INFO tile 28/57 (16384,6144) done; 19 processed, 3365 s elapsed
+2026-11-10 21:56:27,993 INFO tile 29/57 (16384,16384) done; 20 processed, 3605 s elapsed
+2026-11-10 21:59:44,288 INFO tile 30/57 (16384,26624) done; 21 processed, 3801 s elapsed
+2026-11-10 22:03:18,122 INFO tile 32/57 (18432,12288) done; 22 processed, 4015 s elapsed
+2026-11-10 22:06:41,168 INFO tile 33/57 (18432,22528) done; 23 processed, 4218 s elapsed
+2026-11-10 22:10:21,732 INFO tile 35/57 (20480,8192) done; 24 processed, 4439 s elapsed
+2026-11-10 22:14:14,562 INFO tile 36/57 (20480,18432) done; 25 processed, 4671 s elapsed
+2026-11-10 22:17:30,380 INFO tile 37/57 (20480,28672) done; 26 processed, 4867 s elapsed
+2026-11-10 22:18:33,668 INFO tile 38/57 (22528,4096) done; 27 processed, 4930 s elapsed
+2026-11-10 22:22:14,317 INFO tile 39/57 (22528,14336) done; 28 processed, 5151 s elapsed
+2026-11-10 22:25:34,349 INFO tile 40/57 (22528,24576) done; 29 processed, 5351 s elapsed
+2026-11-10 22:28:41,618 INFO tile 42/57 (24576,10240) done; 30 processed, 5538 s elapsed
+2026-11-10 22:32:28,347 INFO tile 43/57 (24576,20480) done; 31 processed, 5765 s elapsed
+2026-11-10 22:34:19,990 INFO tile 44/57 (24576,30720) done; 32 processed, 5877 s elapsed
+2026-11-10 22:35:57,928 INFO tile 45/57 (26624,6144) done; 33 processed, 5975 s elapsed
+2026-11-10 22:38:40,669 INFO tile 46/57 (26624,16384) done; 34 processed, 6137 s elapsed
+2026-11-10 22:40:00,487 INFO tile 47/57 (26624,26624) done; 35 processed, 6217 s elapsed
+2026-11-10 22:41:50,105 INFO tile 49/57 (28672,12288) done; 36 processed, 6327 s elapsed
+2026-11-10 22:42:06,031 INFO tile 50/57 (28672,22528) done; 37 processed, 6343 s elapsed
+2026-11-10 22:42:35,717 INFO tile 52/57 (30720,8192) done; 38 processed, 6373 s elapsed
+2026-11-10 22:42:37,596 INFO done: /Users/nischal/satsure/nisar_analysis/experiments/L10_full_footprint/runs/20261110-205403

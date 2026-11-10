@@ -1,0 +1,144 @@
+# F02_change_L_S
+
+**Status:** done  <!-- planned | running | done | abandoned -->
+**Decision:** S-band and L+S change maps agree better with S1-derived change than L-only (early monsoon → peak OA 0.876 / 0.872 vs 0.823). L-band reports more gain (158 vs 131 km²), consistent with flooded vegetation. **No change in method**: PCC stays, and the source follows the F01 decision (L-only in production).
+**Owner / date:** nischal, 2026-11-10
+
+## Question / hypothesis
+Do change maps (Tasks D/E) differ between L-only, S-only and L+S masks during the monsoon, when there is no optical reference?
+
+## Data
+- F01 masks `L_lgbm`, `S_lgbm`, `LS_lgbm` (run 20261110-033355), 8 dates from Jul to Oct 2026, bbox.
+- Pairs: early monsoon → peak (07-14 → 09-12), peak → recession (09-12 → 10-18), and all consecutive pairs.
+- Comparison reference: change classes from the two **Sentinel-1** masks (C-band VV), on test blocks. This is a consistency check, not truth. No S2 pair exists in this period.
+
+## Method & parameters
+Post-classification comparison (L09 method) for each mask source; new water = gain outside persistent water (R00 dry-season S2).
+
+## Baseline compared against
+`pcc_L` vs `pcc_S` vs `pcc_LS` on identical pairs and blocks.
+
+## Results
+Auto-filled by `uv run nisar-water report <ID>` from the latest run. Do not edit inside the markers.
+<!-- RESULTS:START -->
+Run: `experiments/F02_change_L_S/runs/20261110-034259`
+
+**Headline:** best method = pcc_S (mean gain/loss F1 vs S2 change, test blocks) = 0.3382
+
+| metric | value |
+|---|---|
+| source_run | experiments/F01_L_S_fusion/runs/20261110-033355 |
+
+**Change-class areas per pair (km², full bbox)**
+
+| pair                              | method   |   Stable non-water (km²) |   Stable water (km²) |   Newly detected water (gain) (km²) |   Water loss (receded) (km²) |   New water outside persistent (km²) |
+|:----------------------------------|:---------|-------------------------:|---------------------:|------------------------------------:|-----------------------------:|-------------------------------------:|
+| early monsoon → peak              | pcc_L    |                   235.18 |                31.78 |                              157.85 |                         1.67 |                               151.36 |
+| early monsoon → peak              | pcc_S    |                   263.74 |                29.79 |                              131.16 |                         1.79 |                               125.22 |
+| early monsoon → peak              | pcc_LS   |                   258.24 |                28.71 |                              138.24 |                         1.29 |                               132.03 |
+| peak → recession                  | pcc_L    |                   232.68 |                78.30 |                                4.17 |                       111.33 |                                 3.25 |
+| peak → recession                  | pcc_S    |                   260.59 |                73.55 |                                4.94 |                        87.40 |                                 3.84 |
+| peak → recession                  | pcc_LS   |                   254.74 |                69.27 |                                4.78 |                        97.68 |                                 3.75 |
+| consecutive 2026-07-14→2026-07-26 | pcc_L    |                   369.79 |                30.76 |                               23.23 |                         2.69 |                                18.44 |
+| consecutive 2026-07-14→2026-07-26 | pcc_S    |                   371.90 |                28.50 |                               22.99 |                         3.08 |                                18.03 |
+| consecutive 2026-07-14→2026-07-26 | pcc_LS   |                   375.35 |                27.87 |                               21.13 |                         2.13 |                                16.32 |
+| consecutive 2026-07-26→2026-08-19 | pcc_L    |                   320.95 |                50.12 |                               51.54 |                         3.87 |                                49.45 |
+| consecutive 2026-07-26→2026-08-19 | pcc_S    |                   329.34 |                47.53 |                               45.65 |                         3.96 |                                43.15 |
+| consecutive 2026-07-26→2026-08-19 | pcc_LS   |                   332.92 |                45.56 |                               44.56 |                         3.44 |                                42.34 |
+| consecutive 2026-08-19→2026-08-31 | pcc_L    |                   263.10 |                98.17 |                               61.72 |                         3.49 |                                60.50 |
+| consecutive 2026-08-19→2026-08-31 | pcc_S    |                   288.26 |                87.90 |                               45.04 |                         5.28 |                                43.92 |
+| consecutive 2026-08-19→2026-08-31 | pcc_LS   |                   285.19 |                86.22 |                               51.17 |                         3.90 |                                49.93 |
+| consecutive 2026-08-31→2026-09-12 | pcc_L    |                   226.25 |               149.29 |                               40.34 |                        10.60 |                                39.61 |
+| consecutive 2026-08-31→2026-09-12 | pcc_S    |                   257.04 |               124.46 |                               36.49 |                         8.48 |                                34.97 |
+| consecutive 2026-08-31→2026-09-12 | pcc_LS   |                   251.50 |               129.37 |                               37.58 |                         8.02 |                                36.56 |
+| consecutive 2026-09-12→2026-09-24 | pcc_L    |                   198.73 |               164.55 |                               38.12 |                        25.07 |                                37.03 |
+| consecutive 2026-09-12→2026-09-24 | pcc_S    |                   232.35 |               128.06 |                               33.18 |                        32.89 |                                31.87 |
+| consecutive 2026-09-12→2026-09-24 | pcc_LS   |                   159.58 |               158.01 |                               99.94 |                         8.94 |                                98.30 |
+| consecutive 2026-09-24→2026-10-06 | pcc_L    |                   207.29 |               163.21 |                               16.52 |                        39.46 |                                16.36 |
+| consecutive 2026-09-24→2026-10-06 | pcc_S    |                   247.79 |               116.90 |                               17.45 |                        44.34 |                                16.62 |
+| consecutive 2026-09-24→2026-10-06 | pcc_LS   |                   164.48 |               139.73 |                                4.04 |                       118.23 |                                 3.96 |
+| consecutive 2026-10-06→2026-10-18 | pcc_L    |                   243.96 |                79.68 |                                2.79 |                       100.05 |                                 2.07 |
+| consecutive 2026-10-06→2026-10-18 | pcc_S    |                   287.91 |                74.27 |                                4.22 |                        60.08 |                                 3.16 |
+| consecutive 2026-10-06→2026-10-18 | pcc_LS   |                   278.87 |                70.22 |                                3.84 |                        73.55 |                                 2.78 |
+
+**Water area per date (km²)**
+
+| date       |   water_km2 |   valid_km2 |
+|:-----------|------------:|------------:|
+| 2026-07-14 |       33.45 |      426.48 |
+| 2026-07-26 |       53.99 |      426.48 |
+| 2026-08-19 |      101.66 |      426.48 |
+| 2026-08-31 |      159.89 |      426.48 |
+| 2026-09-12 |      189.63 |      426.48 |
+| 2026-09-24 |      202.67 |      426.48 |
+| 2026-10-06 |      179.73 |      426.48 |
+| 2026-10-18 |       82.47 |      426.48 |
+
+**Assessment vs S2-derived change (TEST blocks; S2 pairs only)**
+
+| pair                              | method   |       n |    oa |   gain_f1 |   gain_precision |   gain_recall |   loss_f1 |   loss_precision |   loss_recall |   stable_water_f1 |   stable_water_precision |   stable_water_recall |   ref_gain_km2 |   ref_loss_km2 |   map_gain_km2_test |   map_loss_km2_test |
+|:----------------------------------|:---------|--------:|------:|----------:|-----------------:|--------------:|----------:|-----------------:|--------------:|------------------:|-------------------------:|----------------------:|---------------:|---------------:|--------------------:|--------------------:|
+| early monsoon → peak              | pcc_L    | 4264756 | 0.823 |     0.762 |            0.675 |         0.875 |     0.028 |            0.069 |         0.018 |             0.764 |                    0.758 |                 0.770 |        121.802 |          6.540 |             157.845 |               1.668 |
+| early monsoon → peak              | pcc_S    | 4264756 | 0.876 |     0.828 |            0.799 |         0.860 |     0.061 |            0.141 |         0.039 |             0.777 |                    0.796 |                 0.758 |        121.802 |          6.540 |             131.159 |               1.787 |
+| early monsoon → peak              | pcc_LS   | 4264756 | 0.872 |     0.822 |            0.774 |         0.878 |     0.049 |            0.150 |         0.030 |             0.789 |                    0.825 |                 0.757 |        121.802 |          6.540 |             138.242 |               1.289 |
+| peak → recession                  | pcc_L    | 4264756 | 0.795 |     0.094 |            0.098 |         0.091 |     0.631 |            0.554 |         0.734 |             0.751 |                    0.707 |                 0.801 |          4.498 |         83.948 |               4.172 |             111.330 |
+| peak → recession                  | pcc_S    | 4264756 | 0.855 |     0.168 |            0.160 |         0.176 |     0.711 |            0.697 |         0.726 |             0.792 |                    0.769 |                 0.818 |          4.498 |         83.948 |               4.937 |              87.397 |
+| peak → recession                  | pcc_LS   | 4264756 | 0.849 |     0.145 |            0.140 |         0.149 |     0.714 |            0.664 |         0.772 |             0.787 |                    0.786 |                 0.788 |          4.498 |         83.948 |               4.784 |              97.678 |
+| consecutive 2026-07-14→2026-07-26 | pcc_L    | 4264756 | 0.924 |     0.572 |            0.518 |         0.640 |     0.045 |            0.096 |         0.029 |             0.821 |                    0.797 |                 0.846 |         18.820 |          8.856 |              23.232 |               2.690 |
+| consecutive 2026-07-14→2026-07-26 | pcc_S    | 4264756 | 0.925 |     0.581 |            0.528 |         0.645 |     0.044 |            0.086 |         0.030 |             0.810 |                    0.817 |                 0.804 |         18.820 |          8.856 |              22.992 |               3.082 |
+| consecutive 2026-07-14→2026-07-26 | pcc_LS   | 4264756 | 0.931 |     0.596 |            0.564 |         0.633 |     0.038 |            0.098 |         0.024 |             0.833 |                    0.850 |                 0.817 |         18.820 |          8.856 |              21.133 |               2.131 |
+| consecutive 2026-07-26→2026-08-19 | pcc_L    | 4264756 | 0.873 |     0.578 |            0.532 |         0.633 |     0.060 |            0.072 |         0.052 |             0.800 |                    0.738 |                 0.873 |         43.339 |          5.408 |              51.538 |               3.873 |
+| consecutive 2026-07-26→2026-08-19 | pcc_S    | 4264756 | 0.887 |     0.600 |            0.585 |         0.616 |     0.089 |            0.106 |         0.077 |             0.812 |                    0.768 |                 0.861 |         43.339 |          5.408 |              45.650 |               3.963 |
+| consecutive 2026-07-26→2026-08-19 | pcc_LS   | 4264756 | 0.893 |     0.614 |            0.606 |         0.623 |     0.075 |            0.097 |         0.061 |             0.824 |                    0.796 |                 0.855 |         43.339 |          5.408 |              44.561 |               3.442 |
+| consecutive 2026-08-19→2026-08-31 | pcc_L    | 4264756 | 0.805 |     0.506 |            0.454 |         0.572 |     0.026 |            0.055 |         0.017 |             0.764 |                    0.672 |                 0.887 |         48.977 |         11.374 |              61.721 |               3.487 |
+| consecutive 2026-08-19→2026-08-31 | pcc_S    | 4264756 | 0.851 |     0.577 |            0.602 |         0.553 |     0.066 |            0.105 |         0.049 |             0.808 |                    0.746 |                 0.882 |         48.977 |         11.374 |              45.038 |               5.276 |
+| consecutive 2026-08-19→2026-08-31 | pcc_LS   | 4264756 | 0.850 |     0.577 |            0.565 |         0.590 |     0.062 |            0.122 |         0.042 |             0.816 |                    0.760 |                 0.881 |         48.977 |         11.374 |              51.171 |               3.896 |
+| consecutive 2026-08-31→2026-09-12 | pcc_L    | 4264756 | 0.786 |     0.395 |            0.387 |         0.405 |     0.033 |            0.030 |         0.037 |             0.787 |                    0.695 |                 0.906 |         38.538 |          8.772 |              40.337 |              10.600 |
+| consecutive 2026-08-31→2026-09-12 | pcc_S    | 4264756 | 0.851 |     0.494 |            0.507 |         0.480 |     0.071 |            0.073 |         0.070 |             0.860 |                    0.826 |                 0.897 |         38.538 |          8.772 |              36.493 |               8.480 |
+| consecutive 2026-08-31→2026-09-12 | pcc_LS   | 4264756 | 0.845 |     0.492 |            0.498 |         0.486 |     0.060 |            0.063 |         0.058 |             0.855 |                    0.806 |                 0.911 |         38.538 |          8.772 |              37.578 |               8.021 |
+| consecutive 2026-09-12→2026-09-24 | pcc_L    | 4264756 | 0.710 |     0.078 |            0.056 |         0.127 |     0.321 |            0.417 |         0.261 |             0.749 |                    0.632 |                 0.920 |         16.766 |         40.068 |              38.120 |              25.075 |
+| consecutive 2026-09-12→2026-09-24 | pcc_S    | 4264756 | 0.784 |     0.117 |            0.088 |         0.175 |     0.469 |            0.520 |         0.427 |             0.828 |                    0.779 |                 0.883 |         16.766 |         40.068 |              33.177 |              32.889 |
+| consecutive 2026-09-12→2026-09-24 | pcc_LS   | 4264756 | 0.628 |     0.096 |            0.056 |         0.334 |     0.209 |            0.573 |         0.128 |             0.786 |                    0.674 |                 0.943 |         16.766 |         40.068 |              99.945 |               8.942 |
+| consecutive 2026-09-24→2026-10-06 | pcc_L    | 4264756 | 0.709 |     0.216 |            0.307 |         0.166 |     0.106 |            0.079 |         0.158 |             0.742 |                    0.621 |                 0.921 |         30.498 |         19.780 |              16.518 |              39.464 |
+| consecutive 2026-09-24→2026-10-06 | pcc_S    | 4264756 | 0.782 |     0.330 |            0.453 |         0.259 |     0.163 |            0.118 |         0.263 |             0.837 |                    0.813 |                 0.864 |         30.498 |         19.780 |              17.451 |              44.339 |
+| consecutive 2026-09-24→2026-10-06 | pcc_LS   | 4264756 | 0.620 |     0.106 |            0.452 |         0.060 |     0.123 |            0.072 |         0.431 |             0.804 |                    0.719 |                 0.913 |         30.498 |         19.780 |               4.043 |             118.228 |
+| consecutive 2026-10-06→2026-10-18 | pcc_L    | 4264756 | 0.784 |     0.034 |            0.039 |         0.031 |     0.548 |            0.467 |         0.664 |             0.756 |                    0.711 |                 0.807 |          3.488 |         70.355 |               2.794 |             100.049 |
+| consecutive 2026-10-06→2026-10-18 | pcc_S    | 4264756 | 0.858 |     0.081 |            0.074 |         0.089 |     0.637 |            0.691 |         0.590 |             0.799 |                    0.777 |                 0.823 |          3.488 |         70.355 |               4.218 |              60.077 |
+| consecutive 2026-10-06→2026-10-18 | pcc_LS   | 4264756 | 0.846 |     0.061 |            0.059 |         0.064 |     0.637 |            0.623 |         0.651 |             0.791 |                    0.791 |                 0.791 |          3.488 |         70.355 |               3.837 |              73.550 |
+
+**Mean over S2 pairs**
+
+| method   |    oa |   gain_f1 |   loss_f1 |
+|:---------|------:|----------:|----------:|
+| pcc_L    | 0.801 |     0.360 |     0.200 |
+| pcc_LS   | 0.815 |     0.390 |     0.219 |
+| pcc_S    | 0.852 |     0.420 |     0.257 |
+
+Figures:
+- [change_pcc_LS_2026-07-14_2026-09-12.png](runs/20261110-034259/figures/change_pcc_LS_2026-07-14_2026-09-12.png)
+- [change_pcc_LS_2026-09-12_2026-10-18.png](runs/20261110-034259/figures/change_pcc_LS_2026-09-12_2026-10-18.png)
+- [change_pcc_L_2026-07-14_2026-09-12.png](runs/20261110-034259/figures/change_pcc_L_2026-07-14_2026-09-12.png)
+- [change_pcc_L_2026-09-12_2026-10-18.png](runs/20261110-034259/figures/change_pcc_L_2026-09-12_2026-10-18.png)
+- [change_pcc_S_2026-07-14_2026-09-12.png](runs/20261110-034259/figures/change_pcc_S_2026-07-14_2026-09-12.png)
+- [change_pcc_S_2026-09-12_2026-10-18.png](runs/20261110-034259/figures/change_pcc_S_2026-09-12_2026-10-18.png)
+- [new_water_pcc_LS_2026-07-14_2026-09-12.png](runs/20261110-034259/figures/new_water_pcc_LS_2026-07-14_2026-09-12.png)
+- [new_water_pcc_LS_2026-09-12_2026-10-18.png](runs/20261110-034259/figures/new_water_pcc_LS_2026-09-12_2026-10-18.png)
+- [new_water_pcc_L_2026-07-14_2026-09-12.png](runs/20261110-034259/figures/new_water_pcc_L_2026-07-14_2026-09-12.png)
+- [new_water_pcc_L_2026-09-12_2026-10-18.png](runs/20261110-034259/figures/new_water_pcc_L_2026-09-12_2026-10-18.png)
+- [new_water_pcc_S_2026-07-14_2026-09-12.png](runs/20261110-034259/figures/new_water_pcc_S_2026-07-14_2026-09-12.png)
+- [new_water_pcc_S_2026-09-12_2026-10-18.png](runs/20261110-034259/figures/new_water_pcc_S_2026-09-12_2026-10-18.png)
+- [water_occurrence.png](runs/20261110-034259/figures/water_occurrence.png)
+<!-- RESULTS:END -->
+
+## Observations & failure modes
+- **Early monsoon → peak:**
+  - gain is L 158 km², LS 138 km², S 131 km², against S1 122 km²;
+  - gain F1 vs S1 is S 0.83, LS 0.82, L 0.76.
+
+  L-band's extra gain sits on the vegetated fringes. That is plausibly real flooded vegetation, which C-band S1 also misses, but it cannot be verified without optical or field data.
+- **Peak → recession:** loss is L 111 km², LS 98 km², S 87 km², against S1 84 km²; loss F1 is 0.71 for S and LS against 0.63 for L.
+- **Consecutive pairs around 09-24 break LS:** it reports +100 km² of gain and then −118 km² of loss, which is the F01 over-mapping on that date. L and S stay at 33–38 km² gain. Errors on a single date flow directly into PCC, so change products need each date's mask to be robust.
+- Gain/loss F1 on short pairs (12 days) is low (0.03–0.6) for every source, because little real change happens and the residual differences are classification noise. This is the known limitation of PCC.
+
+## Next step
+None for the submission. Report the L vs S change difference in the technical note as a frequency effect (vegetation penetration), with the 09-24 caveat.

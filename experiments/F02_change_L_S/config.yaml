@@ -1,0 +1,93 @@
+# F02 (Tasks D/F): change detection (PCC) from L-only, S-only and L+S masks of F01 on the 8 simultaneous L/S dates.
+# No S2 pair exists in Jul-Oct, so change is compared with the change between the S1 water maps of the same
+# dates (agreement, all pixels; S1 is a different sensor, not truth).
+id: F02_change_L_S
+question: Do L-only, S-only and L+S water masks give consistent date-to-date change, and which agrees best with independent S1 change?
+task: change
+data:
+  band: L
+  granules:
+  - NISAR_L2_PR_GCOV_025_098_A_014_4005_DHDH_A_20260714T233813_20260714T233847_P05023_F_F_J_001
+  - NISAR_L2_PR_GCOV_026_098_A_014_4005_DHDH_A_20260726T233812_20260726T233846_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_028_098_A_014_4005_DHDH_A_20260819T233811_20260819T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_029_098_A_014_4005_DHDH_A_20260831T233810_20260831T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_030_098_A_014_4005_DHDH_A_20260912T233810_20260912T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_031_098_A_014_4005_DHDH_A_20260924T233810_20260924T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_032_098_A_014_4005_DHDH_A_20261006T233810_20261006T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_033_098_A_014_4005_DHDH_A_20261018T233811_20261018T233845_P05023_N_F_J_001
+  frequency: frequencyA
+  terms:
+  - HHHH
+  - HVHV
+  extent: bbox
+preprocess:
+  speckle:
+    name: lee
+    size: 7
+    looks: auto
+validation:
+  reference: data/reference/s1_water_{date}.tif
+  split: all
+extra:
+  masks:
+    experiment: F01_L_S_fusion
+    variant: L_lgbm
+  mask_sources:
+  - label: L
+    experiment: F01_L_S_fusion
+    variant: L_lgbm
+  - label: S
+    experiment: F01_L_S_fusion
+    variant: S_lgbm
+  - label: LS
+    experiment: F01_L_S_fusion
+    variant: LS_lgbm
+  methods:
+    pcc_L:
+      kind: pcc
+      source: L
+    pcc_S:
+      kind: pcc
+      source: S
+    pcc_LS:
+      kind: pcc
+      source: LS
+  pairs:
+  - dates:
+    - '2026-07-14'
+    - '2026-09-12'
+    label: "early monsoon \u2192 peak"
+    plot: true
+  - dates:
+    - '2026-09-12'
+    - '2026-10-18'
+    label: "peak \u2192 recession"
+    plot: true
+  - dates:
+    - '2026-07-14'
+    - '2026-07-26'
+    label: "consecutive 2026-07-14\u21922026-07-26"
+  - dates:
+    - '2026-07-26'
+    - '2026-08-19'
+    label: "consecutive 2026-07-26\u21922026-08-19"
+  - dates:
+    - '2026-08-19'
+    - '2026-08-31'
+    label: "consecutive 2026-08-19\u21922026-08-31"
+  - dates:
+    - '2026-08-31'
+    - '2026-09-12'
+    label: "consecutive 2026-08-31\u21922026-09-12"
+  - dates:
+    - '2026-09-12'
+    - '2026-09-24'
+    label: "consecutive 2026-09-12\u21922026-09-24"
+  - dates:
+    - '2026-09-24'
+    - '2026-10-06'
+    label: "consecutive 2026-09-24\u21922026-10-06"
+  - dates:
+    - '2026-10-06'
+    - '2026-10-18'
+    label: "consecutive 2026-10-06\u21922026-10-18"

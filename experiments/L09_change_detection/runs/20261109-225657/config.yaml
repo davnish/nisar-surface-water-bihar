@@ -1,0 +1,131 @@
+# L09: change detection with the champion water masks. PCC = compare two masks; logratio = earlier mask +
+# HH log-ratio |r| > t_db in the expected direction. Assessed vs S2-derived change on TEST blocks where both
+# dates have S2. `masks` points at the champion mapping experiment/variant.
+id: L09_change_detection
+question: 'Which gives more credible change maps: post-classification comparison or log-ratio?'
+task: change
+data:
+  band: L
+  granules:
+  - NISAR_L2_PR_GCOV_006_098_A_014_4005_DHDH_A_20251128T233812_20251128T233847_X05009_N_F_J_001
+  - NISAR_L2_PR_GCOV_007_098_A_014_4005_DHDH_A_20251210T233813_20251210T233847_X05009_N_F_J_001
+  - NISAR_L2_PR_GCOV_008_098_A_014_4005_DHDH_A_20251222T233813_20251222T233848_X05009_N_F_J_001
+  - NISAR_L2_PR_GCOV_009_098_A_014_4005_DHDH_A_20260103T233814_20260103T233848_X05009_N_F_J_001
+  - NISAR_L2_PR_GCOV_010_098_A_014_4005_DHDH_A_20260115T233815_20260115T233849_X05010_N_F_J_001
+  - NISAR_L2_PR_GCOV_023_098_A_014_4005_DHDH_A_20260620T233814_20260620T233849_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_024_098_A_014_4005_DHDH_A_20260702T233813_20260702T233848_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_025_098_A_014_4005_DHDH_A_20260714T233813_20260714T233847_P05023_F_F_J_001
+  - NISAR_L2_PR_GCOV_026_098_A_014_4005_DHDH_A_20260726T233812_20260726T233846_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_028_098_A_014_4005_DHDH_A_20260819T233811_20260819T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_029_098_A_014_4005_DHDH_A_20260831T233810_20260831T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_030_098_A_014_4005_DHDH_A_20260912T233810_20260912T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_031_098_A_014_4005_DHDH_A_20260924T233810_20260924T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_032_098_A_014_4005_DHDH_A_20261006T233810_20261006T233845_P05023_N_F_J_001
+  - NISAR_L2_PR_GCOV_033_098_A_014_4005_DHDH_A_20261018T233811_20261018T233845_P05023_N_F_J_001
+  frequency: frequencyA
+  terms:
+  - HHHH
+  - HVHV
+  extent: bbox
+preprocess:
+  speckle:
+    name: lee
+    size: 7
+    looks: auto
+validation:
+  reference: data/reference/s2_water_{date}.tif
+  split: test
+extra:
+  masks:
+    experiment: L07_supervised_rf_lgbm
+    variant: lgbm_rel_full_mmu25
+  methods:
+    pcc: {}
+    logratio_3db:
+      kind: logratio
+      t_db: 3.0
+    logratio_5db:
+      kind: logratio
+      t_db: 5.0
+  pairs:
+  - dates:
+    - '2025-11-28'
+    - '2026-01-15'
+    label: dry-season recession (S2 both)
+    plot: true
+  - dates:
+    - '2026-01-15'
+    - '2026-10-18'
+    label: "dry season \u2192 post-monsoon (S2 both)"
+    plot: true
+  - dates:
+    - '2026-01-15'
+    - '2026-09-12'
+    label: "dry season \u2192 monsoon peak"
+    plot: true
+  - dates:
+    - '2026-06-20'
+    - '2026-09-12'
+    label: "pre-monsoon \u2192 monsoon peak"
+    plot: true
+  - dates:
+    - '2026-09-12'
+    - '2026-10-18'
+    label: "monsoon peak \u2192 recession"
+    plot: true
+  - dates:
+    - '2025-11-28'
+    - '2025-12-10'
+    label: "consecutive 2025-11-28\u21922025-12-10"
+  - dates:
+    - '2025-12-10'
+    - '2025-12-22'
+    label: "consecutive 2025-12-10\u21922025-12-22"
+  - dates:
+    - '2025-12-22'
+    - '2026-01-03'
+    label: "consecutive 2025-12-22\u21922026-01-03"
+  - dates:
+    - '2026-01-03'
+    - '2026-01-15'
+    label: "consecutive 2026-01-03\u21922026-01-15"
+  - dates:
+    - '2026-01-15'
+    - '2026-06-20'
+    label: "consecutive 2026-01-15\u21922026-06-20"
+  - dates:
+    - '2026-06-20'
+    - '2026-07-02'
+    label: "consecutive 2026-06-20\u21922026-07-02"
+  - dates:
+    - '2026-07-02'
+    - '2026-07-14'
+    label: "consecutive 2026-07-02\u21922026-07-14"
+  - dates:
+    - '2026-07-14'
+    - '2026-07-26'
+    label: "consecutive 2026-07-14\u21922026-07-26"
+  - dates:
+    - '2026-07-26'
+    - '2026-08-19'
+    label: "consecutive 2026-07-26\u21922026-08-19"
+  - dates:
+    - '2026-08-19'
+    - '2026-08-31'
+    label: "consecutive 2026-08-19\u21922026-08-31"
+  - dates:
+    - '2026-08-31'
+    - '2026-09-12'
+    label: "consecutive 2026-08-31\u21922026-09-12"
+  - dates:
+    - '2026-09-12'
+    - '2026-09-24'
+    label: "consecutive 2026-09-12\u21922026-09-24"
+  - dates:
+    - '2026-09-24'
+    - '2026-10-06'
+    label: "consecutive 2026-09-24\u21922026-10-06"
+  - dates:
+    - '2026-10-06'
+    - '2026-10-18'
+    label: "consecutive 2026-10-06\u21922026-10-18"

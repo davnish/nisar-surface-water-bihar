@@ -1,0 +1,23 @@
+id: R00_reference_build
+question: "Can we build trustworthy same-date reference water masks (S2), persistent water (JRC) and S1 comparison maps?"
+task: reference
+data:
+  band: L
+extra:
+  nisar_tracks: [98, 120]         # asc dual-pol series + desc quad-pol series
+  s2_max_days: 3                  # search window around each NISAR acquisition
+  s2_blue_max: 0.2                # cloud = B02 > this AND B02/B04 >= s2_blue_red_min (SCL misses broken cumulus)
+  s2_blue_red_min: 0.85           # cloud is white (0.90-1.01); bright sand is yellow-red (0.71-0.81)
+  s2_cloud_buffer_m: 200          # dilate cloud/shadow masks (edges, thin haze)...
+  s2_buffer_min_cloud_m2: 10000   # ...but only clusters >= 1 ha (SCL flags bright-sand specks as cloud)
+  s2_min_clear: 0.3               # min clear fraction of the bbox; partial references only score clear pixels
+  mndwi_threshold: 0.0            # Xu (2006); the Otsu MNDWI threshold is reported for comparison
+  qc_min_f1_mndwi_vs_ndwi: 0.5    # reject a reference whose MNDWI and NDWI water maps disagree
+  dry_season_months: [11, 12, 1, 2, 3]
+  persistent_min_obs: 2           # clear dry-season observations needed to call a pixel persistent water
+  jrc_persistent_occurrence: 75   # % of 1984-2020 observations that were water (context only)
+  s1_max_days: 6
+  s1_tile_px: 256                 # tiled bimodal thresholding for S1 VV
+  block_size_m: 2000
+  test_fraction: 0.3
+  seed: 42

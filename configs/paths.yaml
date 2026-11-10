@@ -1,0 +1,6 @@
+raw_nisar_L: data/raw/nisar_L
+raw_nisar_S: data/raw/nisar_S
+ancillary: data/raw/ancillary
+interim: data/interim
+processed: data/processed
+reference: data/reference

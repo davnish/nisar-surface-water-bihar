@@ -1,0 +1,19 @@
+{
+  "timestamp_utc": "2026-10-25T19:49:26+00:00",
+  "git_commit": "06f913dadc8ebca313868e3db5599861398c195a",
+  "git_dirty": true,
+  "nisar_polarimetric_training_commit": "f2c96ff9d9d427711ae56dd756aba2051c37f4ec",
+  "python": "3.12.12",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "packages": {
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "h5py": "3.16.0",
+    "rasterio": "1.5.2",
+    "xarray": "2026.9.0",
+    "scikit-learn": "1.9.1",
+    "scikit-image": "0.26.0",
+    "lightgbm": "4.7.0"
+  },
+  "inputs": []
+}

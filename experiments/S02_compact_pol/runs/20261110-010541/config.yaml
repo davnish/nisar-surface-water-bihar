@@ -1,0 +1,73 @@
+# S02 (Task H iii): S-band compact-pol (desc 120/76, mode 2500 CRNA, 2026-09-14, monsoon) from Bhoonidhi.
+# NO optical reference exists for this date (cloud): validation.reference is the Sentinel-1 VV water map of
+# 2026-09-14 used as a *comparison* (agreement, not accuracy). Reference-free tiled-KI maps per descriptor +
+# per-descriptor separability against the S1 map. Terms named as in the product (checked when the window arrives).
+id: S02_compact_pol
+question: Which S-band compact-pol descriptors separate water from land, and do they map water more consistently than CP intensity alone?
+task: water_mask
+data:
+  band: S
+  granules:
+  - NISAR_S2_PR_GCOV_030_120_D_076_2500_CRNA_A_20260914T125059_20260914T125135_P00500_M_F_I_001
+  frequency: frequencyA
+  terms:
+  - RHRH
+  - RHRV
+  - RVRV
+  extent: bbox
+preprocess:
+  speckle:
+    name: boxcar
+    size: 3
+validation:
+  reference: data/reference/s1_water_{date}.tif
+  split: test
+extra:
+  features: compact
+  separability: true
+  plot_date: '2026-09-14'
+  variants:
+  - name: RH_tiled
+    method: threshold
+    params:
+      kind: tiled
+      feature: HH
+      tiled: &id001
+        tile: 256
+        n_tiles: 10
+        method: ki
+        bounded: true
+    refine:
+      mmu_px: 25
+  - name: RV_tiled
+    method: threshold
+    params:
+      kind: tiled
+      feature: RV
+      tiled: *id001
+    refine:
+      mmu_px: 25
+  - name: g0_tiled
+    method: threshold
+    params:
+      kind: tiled
+      feature: g0
+      tiled: *id001
+    refine:
+      mmu_px: 25
+  - name: mchi_surface_tiled
+    method: threshold
+    params:
+      kind: tiled
+      feature: mchi_surface
+      tiled: *id001
+    refine:
+      mmu_px: 25
+  - name: mchi_double_tiled
+    method: threshold
+    params:
+      kind: tiled
+      feature: mchi_double_bounce
+      tiled: *id001
+    refine:
+      mmu_px: 25

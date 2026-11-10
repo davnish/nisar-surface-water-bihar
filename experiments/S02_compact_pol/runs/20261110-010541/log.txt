@@ -1,0 +1,2 @@
+2026-11-10 01:05:41,369 INFO running S02_compact_pol (water_mask) -> /Users/nischal/satsure/nisar_analysis/experiments/S02_compact_pol/runs/20261110-010541
+2026-11-10 01:05:42,542 INFO 2026-09-14: features ready (ENL None)

@@ -1,0 +1,9 @@
+# Reference AOI from the problem statement (section 3). Scene discovery / verification only:
+# final outputs must cover the full selected NISAR scene footprint.
+name: bihar_ganga_floodplain
+centre: {lat: 25.5000, lon: 86.5000}
+bbox_wsen: [86.3946, 25.4098, 86.6054, 25.5902]
+bbox_geojson: data/bbox.geojson
+candidates:
+  ascending: {relative_orbit: 98, frame: 14}
+  descending: {relative_orbit: 120, frame: 76}
